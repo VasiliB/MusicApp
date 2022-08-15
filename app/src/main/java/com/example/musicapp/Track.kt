@@ -1,11 +1,18 @@
 package com.example.musicapp
 
-import java.io.Serializable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Track(
 //    @SerialName("title")
+    @SerialName("title")
     val title: String,
+    @SerialName("artist")
     val artist: String,
-    val bitmapUri: String?,
+    @SerialName("bitmapUri")
+    val coverUri: String?,
+    @SerialName("trackUri")
     val trackUri: String?,
-) : Serializable
+)
+//    : Serializable

@@ -7,6 +7,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import coil.load
 import com.example.musicapp.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 
 
@@ -15,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     // creating a variable for
     // button and media player
     private lateinit var binding: ActivityMainBinding
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     //    var previousBtn: Button? = null
 //    var playBtn = null
@@ -45,34 +50,18 @@ class MainActivity : AppCompatActivity() {
 
         // setting on click listener for our play and pause buttons.
         binding.playBtn.setOnClickListener { // calling method to play audio.
-            playTrack()
-            loadCover()
+            scope.launch { playTrack() }
+            scope.launch { loadCover() }
             setName()
         }
         binding.pauseBtn.setOnClickListener {
             // checking the media player
             // if the audio is playing or not.
-            if (mediaPlayer.isPlaying) {
-                // pausing the media player if media player
-                // is playing we are calling below line to
-                // stop our media player.
-                mediaPlayer.stop()
-                mediaPlayer.reset()
-                mediaPlayer.release()
-
-                // below line is to display a message
-                // when media player is paused.
-                Toast.makeText(this@MainActivity, "Audio has been paused", Toast.LENGTH_SHORT)
-                    .show()
-            } else {
-                // this method is called when media
-                // player is not playing.
-                Toast.makeText(this@MainActivity, "Audio has not played", Toast.LENGTH_SHORT).show()
-            }
+            stopTrack()
         }
     }
 
-    private fun playTrack() {
+    private suspend fun playTrack() = withContext(Dispatchers.IO) {
         val trackUrl =
             "https://music-2021.ru/uploads/files/2021-04/1619469591_rick-astley-never-gonna-give-you-up.mp3"
 
@@ -95,11 +84,31 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
         // below line is use to display a toast message.
-        Toast.makeText(this, "Audio started playing..", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@MainActivity, "Audio started playing..", Toast.LENGTH_SHORT).show()
 
     }
 
-    private fun loadCover() {
+     private fun stopTrack()  {
+        if (mediaPlayer.isPlaying) {
+            // pausing the media player if media player
+            // is playing we are calling below line to
+            // stop our media player.
+            mediaPlayer.stop()
+            mediaPlayer.reset()
+            mediaPlayer.release()
+
+            // below line is to display a message
+            // when media player is paused.
+            Toast.makeText(this@MainActivity, "Audio has been paused", Toast.LENGTH_SHORT)
+                .show()
+        } else {
+            // this method is called when media
+            // player is not playing.
+            Toast.makeText(this@MainActivity, "Audio has not played", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private suspend fun loadCover() = withContext(Dispatchers.IO) {
 
         val coverUrl = "https://i1.sndcdn.com/artworks-qyrckKJE1mdut7kS-6IJvzQ-t500x500.jpg"
         val cover = binding.cover
