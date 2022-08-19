@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Track(
-//    @SerialName("title")
     @SerialName("title")
     val title: String,
     @SerialName("artist")
@@ -15,4 +14,3 @@ data class Track(
     @SerialName("trackUri")
     val trackUri: String?,
 )
-//    : Serializable
