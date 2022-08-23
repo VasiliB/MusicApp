@@ -5,18 +5,18 @@
     android:viewportWidth="120"
     android:viewportHeight="120.11">
   <path
-      android:pathData="M13.69,4.23L106.32,4.23A9.46,9.46 90,0 1,115.78 13.69L115.78,106.41A9.46,9.46 90,0 1,106.32 115.87L13.69,115.87A9.46,9.46 90,0 1,4.23 106.41L4.23,13.69A9.46,9.46 90,0 1,13.69 4.23z"
+      android:pathData="M13.69,4.23L106.32,4.23A9.46,9.46 90,0 1,115.77 13.69L115.77,106.41A9.46,9.46 90,0 1,106.32 115.87L13.69,115.87A9.46,9.46 90,0 1,4.23 106.41L4.23,13.69A9.46,9.46 90,0 1,13.69 4.23z"
       android:strokeWidth="0.43"
       android:fillColor="#1f241c"
       android:strokeColor="#ffffff"
       android:fillType="evenOdd"/>
   <path
-      android:pathData="M13.69,4.23L106.32,4.23A9.46,9.46 90,0 1,115.78 13.69L115.78,106.41A9.46,9.46 90,0 1,106.32 115.87L13.69,115.87A9.46,9.46 90,0 1,4.23 106.41L4.23,13.69A9.46,9.46 90,0 1,13.69 4.23z"
+      android:pathData="M13.69,4.23L106.32,4.23A9.46,9.46 90,0 1,115.77 13.69L115.77,106.41A9.46,9.46 90,0 1,106.32 115.87L13.69,115.87A9.46,9.46 90,0 1,4.23 106.41L4.23,13.69A9.46,9.46 90,0 1,13.69 4.23z"
       android:fillType="evenOdd">
     <aapt:attr name="android:fillColor">
       <gradient 
           android:startX="63.67"
-          android:startY="115.88"
+          android:startY="115.89"
           android:endX="63.28"
           android:endY="4.23"
           android:type="linear">
@@ -45,7 +45,7 @@
       android:fillAlpha="0.54369"/>
   <path
       android:strokeWidth="1"
-      android:pathData="m112.44,91.85c0,0.72 -0.59,1.31 -1.31,1.31s-1.31,-0.59 -1.31,-1.31 0.59,-1.31 1.31,-1.31 1.31,0.59 1.31,1.31z"
+      android:pathData="m112.44,91.86c0,0.72 -0.59,1.31 -1.31,1.31s-1.31,-0.59 -1.31,-1.31 0.59,-1.31 1.31,-1.31 1.31,0.59 1.31,1.31z"
       android:strokeAlpha="0.54369"
       android:fillColor="#00000000"
       android:strokeColor="#ffffff"
@@ -86,11 +86,7 @@
       android:strokeColor="#ffffff"
       android:fillAlpha="0.54369"/>
   <path
-      android:pathData="M39.64,29.48l17.46,0l0,61.15l-17.46,0z"
-      android:fillColor="#ffffff"
-      android:fillType="evenOdd"/>
-  <path
-      android:pathData="M62.91,29.48l17.46,0l0,61.15l-17.46,0z"
+      android:pathData="m40.23,23.38 l39.55,36.57 -39.48,36.77z"
       android:fillColor="#ffffff"
       android:fillType="evenOdd"/>
 </vector>

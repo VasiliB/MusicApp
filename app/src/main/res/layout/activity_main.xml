@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="@+id/playBtn"
         app:layout_constraintStart_toEndOf="@id/stopBtn"
         app:layout_constraintEnd_toStartOf="@id/playBtn"
-        app:srcCompat="@drawable/pause"
+        app:srcCompat="@drawable/media_pause_svgrepo_com"
         />
 
     <ImageButton
@@ -64,7 +64,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/stopBtn"
         app:layout_constraintVertical_bias="0.0"
-        tools:srcCompat="@drawable/arrow_back" />
+        tools:srcCompat="@drawable/previous_track" />
 
     <ImageView
         android:id="@+id/cover"
@@ -77,7 +77,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/sym_def_app_icon" />
+        app:srcCompat="@drawable/music_equalizer_3_by_merlin2525" />
 
     <TextView
         android:id="@+id/title"

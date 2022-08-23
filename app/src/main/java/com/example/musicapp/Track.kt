@@ -10,7 +10,7 @@ data class Track(
     @SerialName("artist")
     val artist: String,
     @SerialName("bitmapUri")
-    val coverUri: String?,
+    val bitmapUri: String?,
     @SerialName("trackUri")
     val trackUri: String?,
 )
