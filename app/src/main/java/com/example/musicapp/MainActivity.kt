@@ -47,11 +47,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
     private lateinit var title: String
     private lateinit var artist: String
-    private var trackNumber = 1
+    private var trackNumber = 0
     private var tracksQuantity = 1
     private var trackLengthInMs: Int? = null
+    private lateinit var bitmapUri: String
 
-
+    //    private var cover = binding.cover
+    private lateinit var trackUrl: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,62 +65,57 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
         mediaPlayer.setOnCompletionListener(this)
 
-        val seekBarProgress: SeekBar =  findViewById<View>(R.id.SeekBarTestPlay) as SeekBar
+        val seekBarProgress: SeekBar = findViewById<View>(R.id.SeekBarTestPlay) as SeekBar
         seekBarProgress.max = 99 // It means 100% .0-99
         seekBarProgress.setOnTouchListener(this)
 
-        scopeIO.launch {
-            getJsonResult()
-//            tracksQuantity = getJsonResult().body()?.size!!
-            //Update your UI
+        scopeMain.launch {
+            bind(getTrack(trackNumber))
         }
 
-        fun getTracksQuantity(my_result: Response<List<Track>>): Int {
-            tracksQuantity = my_result.body()?.size!!
+
+        fun getTracksQuantity(json: Response<List<Track>>): Int {
+            tracksQuantity = json.body()?.size!!
             return tracksQuantity
         }
 
-        scopeMain.launch { getTracksQuantity(getJsonResult()) }
-
-        // Notification intent
-        val intent = Intent(this, MainActivity::class.java)
-        intent.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-
-        fun trackNotification() {
-            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentTitle(getString(R.string.notification_content_title))
-                .setContentText("$artist-$title")
-                .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-
-            with(NotificationManagerCompat.from(this)) {
-                notify(NOTIFICATION_ID, builder.build()) // посылаем уведомление
-            }
-        }
+        scopeIO.launch { getTracksQuantity(loadConfiguration()) }
 
 
+//        // Notification intent
+//        val intent = Intent(this, MainActivity::class.java)
+//        intent.apply {
+//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//        }
+//        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+//
+//        fun trackNotification() {
+//            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_launcher_background)
+//                .setContentTitle(getString(R.string.notification_content_title))
+//                .setContentText("$artist-$title")
+//                .setAutoCancel(true)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+//                .setContentIntent(pendingIntent)
+//
+//            with(NotificationManagerCompat.from(this)) {
+//                notify(NOTIFICATION_ID, builder.build()) // посылаем уведомление
+//            }
+//        }
 
 
         //Play Button click listener
         binding.playBtn.setOnClickListener { // calling method to play audio.
-            scopeMain.launch { setName(getJsonResult()) }
-            scopeMain.launch { playTrack(getJsonResult(), seekBarProgress) }
-            scopeMain.launch { loadCover(getJsonResult()) }
+            scopeMain.launch { playTrack(seekBarProgress) }
+            trackNotification()
 
             trackLengthInMs = mediaPlayer.duration
 //            primarySeekBarProgressUpdater(seekBarProgress, trackLengthInMs!!)
-            trackNotification()
+//            trackNotification()
         }
 
         //Pause Button click listener
         binding.pauseBtn.setOnClickListener {
-            // checking the media player
-            // if the audio is playing or not.
             pauseTrack()
         }
 
@@ -129,15 +126,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             stopTrack()
         }
 
-
+        //Next Button click listener
         binding.nextBtn.setOnClickListener { // calling method to play audio.
             stopTrack()
             if (trackNumber < tracksQuantity - 1)
                 trackNumber++
             else trackNumber = 0
-            scopeMain.launch { setName(getJsonResult()) }
-            scopeMain.launch { playTrack(getJsonResult(), seekBarProgress) }
-            scopeMain.launch { loadCover(getJsonResult()) }
+//            scopeMain.launch {
+//                bind(getTrack(trackNumber))
+//            }
+            scopeMain.launch { playTrack(seekBarProgress) }
         }
 
         //Previous Button click listener
@@ -146,113 +144,83 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             if (trackNumber > 0)
                 trackNumber--
             else trackNumber = tracksQuantity - 1
-            scopeMain.launch { setName(getJsonResult()) }
-            scopeMain.launch { playTrack(getJsonResult(), seekBarProgress) }
-            scopeMain.launch { loadCover(getJsonResult()) }
+            scopeMain.launch { playTrack(seekBarProgress) }
         }
     }
 
 
-    private suspend fun playTrack(json: Response<List<Track>>, seekBarProgress: SeekBar) = withContext(Dispatchers.IO) {
+    private suspend fun getTrack(trackNumber: Int): Track = withContext(Dispatchers.IO) {
 
-        val trackUrl = json.body()!![trackNumber].trackUri.toString()
+        loadConfiguration()
 
-        // initializing media player
-//        mediaPlayer = MediaPlayer()
+        val track = loadConfiguration().body()!![trackNumber]
 
-        // below line is use to set the audio
-        // stream type for our media player.
-//        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
-
-        // below line is use to set our
-        // url to our media player.
-        try {
-            mediaPlayer.setDataSource(trackUrl)
-            // below line is use to prepare
-            // and start our media player.
-            mediaPlayer.prepare()
-                        mediaPlayer.start()
-
-            trackLengthInMs = mediaPlayer.duration
-
-             fun primarySeekBarProgressUpdater(seekBarProgress: SeekBar, trackLengthInMs: Int) {
-                seekBarProgress.progress =
-                    (mediaPlayer.currentPosition.toFloat() / trackLengthInMs * 100).toInt() // This math construction give a percentage of "was playing"/"song length"
-                if (mediaPlayer.isPlaying) {
-                    val notification =
-                        Runnable { primarySeekBarProgressUpdater(seekBarProgress, trackLengthInMs) }
-                    handler.postDelayed(notification, 1000)
-                }
-            }
-            primarySeekBarProgressUpdater(seekBarProgress, trackLengthInMs!!)
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        // below line is use to display a toast message.
-//        Toast.makeText(this@MainActivity, "Audio started playing..", Toast.LENGTH_SHORT).show()
-
+        return@withContext Track(
+            title = track.title,
+            artist = track.artist,
+            bitmapUri = track.bitmapUri,
+            trackUri = track.trackUri
+        )
     }
 
-    private fun pauseTrack() {
-        if (mediaPlayer.isPlaying)
-            // pausing the media player if media player
-            // is playing we are calling below line to
-            // stop our media player.
-            mediaPlayer.pause()
+    private fun bind(track: Track) {
 
-//            // below line is to display a message
-//            // when media player is paused.
-//            Toast.makeText(this@MainActivity, "Audio has been paused", Toast.LENGTH_SHORT)
-//                .show()
-//        } else {
-//            // this method is called when media
-//            // player is not playing.
-//            Toast.makeText(this@MainActivity, "Audio has not played", Toast.LENGTH_SHORT).show()
-//        }
-    }
-
-    private fun stopTrack() {
-        if (mediaPlayer.isPlaying) {
-            // pausing the media player if media player
-            // is playing we are calling below line to
-            // stop our media player.
-            mediaPlayer.stop()
-            mediaPlayer.reset()
-            mediaPlayer.release()
-
-            // below line is to display a message
-            // when media player is paused.
-            Toast.makeText(this@MainActivity, "Audio has been paused", Toast.LENGTH_SHORT)
-                .show()
-        } else {
-            // this method is called when media
-            // player is not playing.
-            Toast.makeText(this@MainActivity, "Audio has not played", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun loadCover(json: Response<List<Track>>) {
-
-        val bitmapUri = json.body()!![trackNumber].bitmapUri
-        val cover = binding.cover
+        binding.title.text = track.title
+        binding.artist.text = track.artist
+        bitmapUri = track.bitmapUri.toString()
 
         try {
-            cover.load(bitmapUri) {
+            binding.cover.load(bitmapUri) {
                 crossfade(true)
                 placeholder(R.drawable.benbois_vinyl_records)
             }
         } catch (e: IOException) {
             e.printStackTrace()
         }
+
+        trackUrl = track.trackUri.toString()
+        try {
+            mediaPlayer.setDataSource(trackUrl)
+            mediaPlayer.prepare()
+            trackLengthInMs = mediaPlayer.duration
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
-    private fun setName(json: Response<List<Track>>) {
 
-        artist = json.body()!![trackNumber].artist
-        title = json.body()!![trackNumber].title
+    private suspend fun playTrack(seekBarProgress: SeekBar) =
+        withContext(Dispatchers.IO) {
+            try {
+                mediaPlayer.start()
+                trackLengthInMs = mediaPlayer.duration
+                primarySeekBarProgressUpdater(seekBarProgress, trackLengthInMs!!)
 
-        binding.artist.text = artist
-        binding.title.text = title
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+
+    private fun pauseTrack() {
+        if (mediaPlayer.isPlaying)
+            mediaPlayer.pause()
+    }
+
+    private fun stopTrack() {
+        if (mediaPlayer.isPlaying) {
+            mediaPlayer.stop()
+            mediaPlayer.reset()
+            mediaPlayer.release()
+        } else {
+            Toast.makeText(this@MainActivity, "Audio has not played", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun trackNotification() {
+
+        title = binding.title.text.toString()
+        artist = binding.artist.text.toString()
+
 
         val intent = Intent(this, MainActivity::class.java)
         intent.apply {
@@ -271,10 +239,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         with(NotificationManagerCompat.from(this)) {
             notify(NOTIFICATION_ID, builder.build()) // посылаем уведомление
         }
-
     }
 
-    private suspend fun getJsonResult(): Response<List<Track>> = withContext(Dispatchers.IO) {
+    private fun primarySeekBarProgressUpdater(seekBarProgress: SeekBar, trackLengthInMs: Int) {
+        seekBarProgress.progress =
+            (mediaPlayer.currentPosition.toFloat() / trackLengthInMs * 100).toInt() // This math construction give a percentage of "was playing"/"song length"
+        if (mediaPlayer.isPlaying) {
+            val notification =
+                Runnable {
+                    primarySeekBarProgressUpdater(
+                        seekBarProgress,
+                        trackLengthInMs
+                    )
+                }
+            handler.postDelayed(notification, 1000)
+        }
+    }
+
+    private suspend fun loadConfiguration(): Response<List<Track>> = withContext(Dispatchers.IO) {
         val tracksApi = retrofitHelper.getInstance().create(TracksAPI::class.java)
         val result = tracksApi.getTracks()
 
@@ -316,7 +298,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     }
 
 
-
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         if (v.id == R.id.SeekBarTestPlay) {
             /** Seekbar onTouch event handler. Method which seeks MediaPlayer to seekBar primary progress position */
@@ -329,7 +310,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         return false
     }
 
-        /** Method which updates the SeekBar primary progress by current song playing position */
+    /** Method which updates the SeekBar primary progress by current song playing position */
 //    private fun primarySeekBarProgressUpdater(seekBarProgress: SeekBar, trackLengthInMs: Int) {
 //        seekBarProgress.progress =
 //            (mediaPlayer.currentPosition.toFloat() / trackLengthInMs * 100).toInt() // This math construction give a percentage of "was playing"/"song length"
@@ -344,9 +325,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 //        if (trackNumber < tracksQuantity - 1)
 //            trackNumber++
 //        else trackNumber = 0
-//        scopeMain.launch { setName(getJsonResult()) }
-//        scopeMain.launch { playTrack(getJsonResult(), seekBarProgress) }
-//        scopeMain.launch { loadCover(getJsonResult()) }
+//        scopeMain.launch { setName(loadConfiguration()) }
+//        scopeMain.launch { playTrack(loadConfiguration(), seekBarProgress) }
+//        scopeMain.launch { loadCover(loadConfiguration()) }
     }
 
     override fun onBufferingUpdate(p0: MediaPlayer?, p1: Int) {
