@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.recyclerview.widget.DiffUtil
 import coil.load
 import com.example.musicapp.databinding.ActivityMainBinding
 import com.example.musicapp.retrofit.RetrofitHelper
@@ -45,9 +46,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     private val handler = Handler()
     private var mediaPlayer = MediaPlayer()
 
+    private lateinit var configuration: Response<List<Track>>
     private lateinit var title: String
     private lateinit var artist: String
-    private var trackNumber = 0
+    private var trackNumber = 2
     private var tracksQuantity = 1
     private var trackLengthInMs: Int? = null
     private lateinit var bitmapUri: String
@@ -63,15 +65,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         val view = binding.root
         setContentView(view)
 
-        mediaPlayer.setOnCompletionListener(this)
-
-        val seekBarProgress: SeekBar = findViewById<View>(R.id.SeekBarTestPlay) as SeekBar
-        seekBarProgress.max = 99 // It means 100% .0-99
-        seekBarProgress.setOnTouchListener(this)
+        scopeIO.launch {
+            configuration = loadConfiguration()
+            tracksQuantity = configuration.body()?.size!!
+        }
 
         scopeMain.launch {
             bind(getTrack(trackNumber))
         }
+
+        mediaPlayer.setOnCompletionListener(this)
+
+        val seekBarProgress: SeekBar = binding.SeekBarTestPlay
+        seekBarProgress.max = 99 // It means 100% .0-99
+        seekBarProgress.setOnTouchListener(this)
 
 
         fun getTracksQuantity(json: Response<List<Track>>): Int {
@@ -81,37 +88,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
         scopeIO.launch { getTracksQuantity(loadConfiguration()) }
 
-
-//        // Notification intent
-//        val intent = Intent(this, MainActivity::class.java)
-//        intent.apply {
-//            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//        }
-//        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-//
-//        fun trackNotification() {
-//            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setSmallIcon(R.drawable.ic_launcher_background)
-//                .setContentTitle(getString(R.string.notification_content_title))
-//                .setContentText("$artist-$title")
-//                .setAutoCancel(true)
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-//                .setContentIntent(pendingIntent)
-//
-//            with(NotificationManagerCompat.from(this)) {
-//                notify(NOTIFICATION_ID, builder.build()) // посылаем уведомление
-//            }
-//        }
-
-
         //Play Button click listener
         binding.playBtn.setOnClickListener { // calling method to play audio.
+
+
+//            player.setDataSource(getApplicationContext(), trackUri)
+//            player.setAudioStreamType(AudioManager.STREAM_MUSIC)
+//            player.prepareAsync()
             scopeMain.launch { playTrack(seekBarProgress) }
             trackNotification()
 
             trackLengthInMs = mediaPlayer.duration
 //            primarySeekBarProgressUpdater(seekBarProgress, trackLengthInMs!!)
-//            trackNotification()
         }
 
         //Pause Button click listener
@@ -129,12 +117,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         //Next Button click listener
         binding.nextBtn.setOnClickListener { // calling method to play audio.
             stopTrack()
+
             if (trackNumber < tracksQuantity - 1)
                 trackNumber++
             else trackNumber = 0
-//            scopeMain.launch {
-//                bind(getTrack(trackNumber))
-//            }
+            scopeMain.launch {
+                bind(getTrack(trackNumber))
+            }
             scopeMain.launch { playTrack(seekBarProgress) }
         }
 
@@ -151,8 +140,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
     private suspend fun getTrack(trackNumber: Int): Track = withContext(Dispatchers.IO) {
 
-        loadConfiguration()
-
         val track = loadConfiguration().body()!![trackNumber]
 
         return@withContext Track(
@@ -164,6 +151,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
     }
 
     private fun bind(track: Track) {
+//        mediaPlayer.reset()
 
         binding.title.text = track.title
         binding.artist.text = track.artist
@@ -181,7 +169,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         trackUrl = track.trackUri.toString()
         try {
             mediaPlayer.setDataSource(trackUrl)
-            mediaPlayer.prepare()
+            mediaPlayer.prepareAsync()
             trackLengthInMs = mediaPlayer.duration
         } catch (e: IOException) {
             e.printStackTrace()
@@ -332,6 +320,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
     override fun onBufferingUpdate(p0: MediaPlayer?, p1: Int) {
         TODO("Not yet implemented")
+    }
+
+    class DiffCallback : DiffUtil.ItemCallback<Track>() {
+        override fun areItemsTheSame(oldItem: Track, newItem: Track): Boolean {
+            return oldItem.title == newItem.title
+        }
+
+        override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
+            return oldItem == newItem
+        }
     }
 
 }

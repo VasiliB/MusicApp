@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 class RetrofitHelper {
 
     private val baseUrl =
-        "https://raw.githubusercontent.com/VasiliB/MusicApp/In_progress/app/src/main/res/raw/"
+//        "https://raw.githubusercontent.com/VasiliB/MusicApp/In_progress/app/src/main/res/raw/"
+    "https://raw.githubusercontent.com/VasiliB/RSShool2021-Android-task6-Music-App/main/data/"
 
     fun getInstance(): Retrofit {
         val gson = GsonBuilder().setLenient().create()
