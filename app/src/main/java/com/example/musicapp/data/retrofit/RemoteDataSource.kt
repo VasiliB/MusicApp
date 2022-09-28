@@ -1,8 +1,8 @@
 package com.example.musicapp.data.retrofit
 
 import android.util.Log
-import com.example.musicapp.data.Track
 import com.example.musicapp.model.api.TracksAPI
+import com.example.musicapp.model.entity.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
