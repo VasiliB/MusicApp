@@ -1,6 +1,6 @@
-package com.example.musicapp.retrofit
+package com.example.musicapp.model.api
 
-import com.example.musicapp.Track
+import com.example.musicapp.model.entity.Track
 import retrofit2.Response
 import retrofit2.http.GET
 

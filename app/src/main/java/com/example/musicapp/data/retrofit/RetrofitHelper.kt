@@ -1,4 +1,4 @@
-package com.example.musicapp.retrofit
+package com.example.musicapp.data.retrofit
 
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
