@@ -65,10 +65,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
         val view = binding.root
         setContentView(view)
 
-        scopeIO.launch {
-            configuration = loadConfiguration()
-            tracksQuantity = configuration.body()?.size!!
-        }
+//        scopeIO.launch {
+//            configuration = loadConfiguration()
+//            tracksQuantity = configuration.body()?.size!!
+//        }
 
         scopeMain.launch {
             bind(getTrack(trackNumber))
@@ -90,8 +90,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
         //Play Button click listener
         binding.playBtn.setOnClickListener { // calling method to play audio.
-
-
 //            player.setDataSource(getApplicationContext(), trackUri)
 //            player.setAudioStreamType(AudioManager.STREAM_MUSIC)
 //            player.prepareAsync()
@@ -124,7 +122,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
             scopeMain.launch {
                 bind(getTrack(trackNumber))
             }
-            scopeMain.launch { playTrack(seekBarProgress) }
+            scopeMain.launch {playTrack(seekBarProgress)}
         }
 
         //Previous Button click listener
@@ -179,6 +177,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener,
 
     private suspend fun playTrack(seekBarProgress: SeekBar) =
         withContext(Dispatchers.IO) {
+            if (!mediaPlayer.isPlaying)
             try {
                 mediaPlayer.start()
                 trackLengthInMs = mediaPlayer.duration
