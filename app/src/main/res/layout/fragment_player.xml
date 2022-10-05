@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#6A1B9A"
-    tools:context=".MainActivity">
+    tools:context=".view.MainActivity"
+    android:id="@+id/fragment_player">
 
     <ImageButton
         android:id="@+id/pauseBtn"
