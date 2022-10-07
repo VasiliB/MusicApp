@@ -1,20 +1,18 @@
-package com.example.musicapp.model.entity
+package com.example.musicapp.model
 
-import android.os.Parcelable
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import kotlinx.android.parcel.Parcelize
+import com.squareup.moshi.Json
 
 
-@Entity(tableName = "tracks")
-@Parcelize
 data class Track(
-    @PrimaryKey (autoGenerate = true)
+    @Json(name = "title")
     val title: String,
+    @Json(name = "artist")
     val artist: String,
+    @Json(name = "bitmapUri")
     val bitmapUri: String?,
+    @Json(name = "trackUri")
     val trackUri: String?
-): Parcelable
+)
 
 //@Serializable
 //data class Track(

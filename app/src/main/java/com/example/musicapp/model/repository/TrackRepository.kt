@@ -1,10 +1,10 @@
 package com.example.musicapp.model.repository
 
-import com.example.musicapp.model.entity.Track
-import com.example.musicapp.utils.AppResult
+import com.example.musicapp.model.api.ApiHelper
 
-interface TrackRepository {
-    suspend fun getAllTracks() : AppResult<List<Track>>
+class TrackRepository(private val apiHelper: ApiHelper) {
+
+    suspend fun getTracks() = apiHelper.getTracks()
 }
 
 

@@ -1,38 +1,43 @@
 package com.example.musicapp.view_model
 
-import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.musicapp.model.entity.Track
+import com.example.musicapp.model.Track
 import com.example.musicapp.model.repository.TrackRepository
-import com.example.musicapp.utils.AppResult
-import com.example.musicapp.utils.SingleLiveEvent
+import com.example.musicapp.utils.NetworkHelper
+import com.example.musicapp.utils.Resource
 import kotlinx.coroutines.launch
 
 
-class TrackViewModel(private val trackRepository: TrackRepository) : ViewModel() {
+class TrackViewModel(
+    private val trackRepository: TrackRepository,
+    private val networkHelper: NetworkHelper
+) : ViewModel() {
 
-    val showLoading = ObservableBoolean()
-    val tracksList = MutableLiveData<List<Track>?>()
-    val showError = SingleLiveEvent<String?>()
+    private val _tracks = MutableLiveData<Resource<List<Track>>>()
+    val users: LiveData<Resource<List<Track>>>
+        get() = _tracks
 
-    fun getAllTracks() {
-        showLoading.set(true)
+    init {
+        fetchUsers()
+    }
+
+    private fun fetchUsers() {
         viewModelScope.launch {
-            val result =  trackRepository.getAllTracks()
-
-            showLoading.set(false)
-            when (result) {
-                is AppResult.Success -> {
-                    tracksList.value = result.successData
-                    showError.value = null
+            _tracks.postValue(Resource.loading(null))
+            if (networkHelper.isNetworkConnected()) {
+                trackRepository.getTracks().let {
+                    if (it.isSuccessful) {
+                        _tracks.postValue(Resource.success(it.body()))
+                    } else _tracks.postValue(Resource.error(it.errorBody().toString(), null))
                 }
-                is AppResult.Error -> showError.value = result.exception.message
-            }
+            } else _tracks.postValue(Resource.error("No internet connection", null))
         }
     }
 }
+
 
 //class TrackViewModel(private val trackRepository: TrackRepository) : ViewModel() {
 //

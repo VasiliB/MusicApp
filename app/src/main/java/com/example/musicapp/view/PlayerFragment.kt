@@ -1,18 +1,14 @@
 package com.example.musicapp.view
 
 import android.media.MediaPlayer
-import android.os.Bundle
 import android.os.Handler
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.SeekBar
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
 import com.example.musicapp.databinding.FragmentPlayerBinding
-import com.example.musicapp.model.entity.Track
+import com.example.musicapp.model.Track
 import com.example.musicapp.view_model.TrackViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,13 +42,13 @@ class PlayerFragment : Fragment(), View.OnClickListener,
     //    private var cover = binding.cover
     private lateinit var trackUrl: String
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding  = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_player, container, false)
-        val mRootView = binding.root
-        binding.lifecycleOwner = this
-        return mRootView
-    }
+//    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+//        binding  = DataBindingUtil.inflate(inflater,
+//            R.layout.fragment_player, container, false)
+//        val mRootView = binding.root
+//        binding.lifecycleOwner = this
+//        return mRootView
+//    }
 
 //    override fun onCreateView(
 //        inflater: LayoutInflater,

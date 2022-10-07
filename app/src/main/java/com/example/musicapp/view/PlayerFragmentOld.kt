@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.DiffUtil
 import coil.load
 import com.example.musicapp.R
 import com.example.musicapp.databinding.FragmentPlayerBinding
-import com.example.musicapp.model.entity.Track
+import com.example.musicapp.model.Track
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

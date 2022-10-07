@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Track(
+data class Tracki(
     @SerialName("title")
     val title: String,
     @SerialName("artist")

@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.musicapp.model.entity.Track
+import com.example.musicapp.model.Track
 
 @Dao
 interface TrackDao {
