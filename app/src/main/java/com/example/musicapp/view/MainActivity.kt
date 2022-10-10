@@ -12,6 +12,7 @@ import com.example.musicapp.model.Track
 import com.example.musicapp.utils.Status
 import com.example.musicapp.view_model.TrackViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.viewmodel.compat.ViewModelCompat.viewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setupUI()
         setupObserver()
+
     }
 
     private fun setupUI() {
@@ -39,11 +41,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObserver() {
-        mainViewModel.users.observe(this, Observer {
+        mainViewModel.tracks.observe(this, Observer {
             when (it.status) {
                 Status.SUCCESS -> {
                     progressBar.visibility = View.GONE
-                    it.data?.let { users -> renderList(users) }
+                    it.data?.let { tracks -> renderList(tracks) }
                     recyclerView.visibility = View.VISIBLE
                 }
                 Status.LOADING -> {
@@ -59,8 +61,8 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun renderList(users: List<Track>) {
-        adapter.addData(users)
+    private fun renderList(tracks: List<Track>) {
+        adapter.addData(tracks)
         adapter.notifyDataSetChanged()
     }
 

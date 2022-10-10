@@ -17,14 +17,14 @@ class TrackViewModel(
 ) : ViewModel() {
 
     private val _tracks = MutableLiveData<Resource<List<Track>>>()
-    val users: LiveData<Resource<List<Track>>>
+    val tracks: LiveData<Resource<List<Track>>>
         get() = _tracks
 
     init {
-        fetchUsers()
+        fetchTracks()
     }
 
-    private fun fetchUsers() {
+    private fun fetchTracks() {
         viewModelScope.launch {
             _tracks.postValue(Resource.loading(null))
             if (networkHelper.isNetworkConnected()) {

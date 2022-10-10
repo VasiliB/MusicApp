@@ -15,7 +15,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 
 val appModule = module {
     single { provideOkHttpClient() }
-    single { provideRetrofit(get(), "https://raw.githubusercontent.com/VasiliB/MusicApp/master/app/src/main/res/raw/") }
+    single { provideRetrofit(get(),  BuildConfig.BASE_URL) }
     single { provideApiService(get()) }
     single { provideNetworkHelper(androidContext()) }
 
